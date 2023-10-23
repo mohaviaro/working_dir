@@ -1,0 +1,58 @@
+version: '3.1'
+services:
+  wdb:
+    image: yajo/wdb-server
+    ports:
+      - "1984:1984"
+  web:
+#command: odoo -u all -d hwseta
+    # command: odoo -u project_setmis_link -d mohavia2
+    # command: odoo -u module_name -database_name
+    # command: odoo -u all -d mohavia2
+    # image: odoo:12.0
+#    image: odoo:12.0
+    build:
+      context: .
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    volumes:
+      - ./odoo-web-data:/var/lib/odoo
+      - ./config:/etc/odoo
+      #- ./addons:/mnt/extra-addons
+      - ./hwseta_erp/hwseta_addons:/mnt/extra-addons
+    environment:
+      - WDB_SOCKET_SERVER=wdb
+      - WDB_NO_BROWSER_AUTO_OPEN=True
+      - WDB_WEB_PORT=1984
+      - WDB_WEB_SERVER=localhost
+      - PASSWORD_FILE=/run/secrets/postgresql_password
+    secrets:
+      - postgresql_password
+#    command: odoo
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgresql_password
+      - POSTGRES_USER=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./odoo-db-data:/var/lib/postgresql/data/pgdata
+    ports:
+      - 5442:5432
+    secrets:
+      - postgresql_password
+volumes:
+  odoo-web-data:
+  odoo-db-data:
+  
+
+secrets:
+  postgresql_password:
+    file: odoo_pg_pass
+    
+    
+   
+

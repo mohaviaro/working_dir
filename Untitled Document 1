@@ -1,0 +1,260 @@
+
+### Odoo 8 live database backup
+
+history |grep pgdump
+pg_dump -U odoo -d HWSETA -h 172.1.0.8 > /home/mohavias/backup/2023_03_28.sql
+scp 2023_03_28.sql mohavia@workshop.hwseta.org.za:/home/mohavia/2023_03_28.sql
+
+pg_dump -U odoo -d HWSETA -h 172.1.0.8 > /fs/dbbackup/2022_10_06.sql; gzip /fs/dbbackup/2022_10_06.sql
+pg_dump -U odoo -d HWSETA -h 172.1.0.8 > /home/mohavias/2023_09_05.sql; gzip /home/mohavias/2023_09_05.sql
+
+
+scp /fs/dbbackup/2022_10_06.sql.gz deanr@workshop.hwseta.org.za:/home/deanr/2022_10_06.sql.gz
+
+ls -la
+cd ~
+pwd
+sudo chown mohavias:mohavias *
+sudo chown mohavias:mohavias .
+
+
+##workshop
+ssh mohavia@workshop.hwseta.org.za
+psql -U odoo -d postgres -h 192.168.15.68 -c "create database live_2023_03_28 with owner = odoo;"
+
+psql -U odoo -d live_2023_03_28 -h 192.168.15.188 < live_2023_03_28.sql
+
+psql -U odoo -d live_2023_03_28 -h 192.168.15.68 -c "delete from ir_mail_server;"
+
+psql -U odoo -d live_2023_03_28 -h 192.168.15.68 -c "update res_users set password='1' where id = 1"
+
+exit
+psql -U odoo -h 192.168.15.68 -d live_2023_03_01_v6
+
+
+ntppclgmtrzwprck
+##Spice_Works
+https://helpdesk.hwseta.org.za/pro_users/login
+
+
+http://192.168.15.11:8088/pro_users/login
+
+docker-compose exec -u root web /bin/bash
+
+
+
+##SET UP SSH KEY
+ssh-keygen
+eval `ssh-agent`
+ssh-add
+cat ~/.ssh/id_rsa.pub 
+
+
+#CONFIG TEST SERVER FOR BITBUCKET
+nano ~/.ssh/config
+Host bitbucket.org
+  Hostname altssh.bitbucket.org
+  Port 443
+
+
+sudo apt install git
+
+
+sudo apt install docker-compose
+
+ sudo ncdu /   
+
+
+psql -U odoo -d postgres -h test-db
+\l
+copy db name that looks the newest
+\q
+pg_dump -U odoo -d <db name you want> -h test_db > db_file.sql
+mv db_file.sql docker_dir/db
+
+
+## IMPORT .SQL DATABASE
+docker-compose exec db /bin/bash
+
+psql -U odoo -d postgres -h localhost -c "create database october with owner = odoo;"
+
+psql -U odoo -d october < /db/october.sql
+
+psql -U odoo -d october -h localhost -c "delete from ir_mail_server;"
+
+psql -U odoo -d test -h localhost -c "update res_users set password='1' where id = 1"
+
+exit
+
+#####live odoo8
+ssh -l mohavias@hwseta.org.za portal.hwseta.org.za
+sudo su - hwsadmin
+cd hwseta_docker
+cd hwseta_8_bb
+git pull
+docker-compose restart
+cd ..
+cd log
+ls -lals
+
+docker-compose exec -u odoo web /bash /var/log/odoo/update_etqe.sh
+
+### odoo 8 live odoo
+##database
+docker exec -it hwsetadocker_web_1 /bin/bash
+psql -U odoo -h 172.1.0.8 -d HWSETA
+
+docker exec --user odoo -it hwsetadocker_web_1 bash -c "/usr/bin/python /usr/bin/odoo.py --config=/var/log/odoo/odoo_update.conf -u hwseta_sdp -d HWSETA --db_host=172.1.0.8 --db_user=odoo --xmlrpc-port=8084"
+
+[11:29 AM] Dylan Bridge for fixing concurency update
+docker exec -it hwsetadocker_web_1 /bin/bash
+comment workers=17 with a semicolon
+restart the docker
+vim /etc/odoo/openerp-server.conf
+exec into docker and uncomment 7 workers
+restart docker again and check log for workers being alive 
+run the upgrade while tailing log
+
+
+
+odoo 8 test server password
+http://192.168.15.108:8053/
+ssh mohavias@192.168.15.108
+
+#access test server
+docker exec -it modoc_web_1 /bin/bash
+psql -U odoo -h 192.168.15.188 -p 5432 -d mohavia_live_2023_03_01
+
+ATBBJMBEnjAkEmvgjU5LAbJF6QKZ40E1112C
+### odoo 8 test server database :192.168.15.188
+sudo su postgres
+/snap/bin/postgresql96.pgctl -D /home/postgres/snap/postgresql96/common/data/ restart
+psql -U odoo -h localhost -d postgres
+psql -U odoo -d postgres -h localhost -c "create database mohavia_live_2023_03_01 with owner = odoo;"
+psql -h localhost -p 5432 -U odoo -d mohavia_live_2023_03_01 < 2023_03_01.sql 
+psql -U odoo -d mohavia_live_2023_03_01 -h localhost -c "update res_users set password='1' where id = 1"
+psql -U odoo -d september -h localhost -c "delete from ir_mail_server;"
+psql -U odoo -d mohavia_live_2023_03_01 -h localhost -c "delete from ir_ui_view where id=378;
+
+docker exec -it modoc_web_1 /bin/bash
+psql -U odoo -d postgres -h 192.168.15.188 -c "create database live_2023_09_05 with owner = odoo;"
+psql -U odoo -d live_2023_09_05 -h 192.168.15.188 < 2023_09_05.sql
+psql -U odoo -d live_2023_09_05 -h 192.168.15.188 -c "update res_users set password='1' where id = 1"
+psql -U odoo -d live_2023_09_05 -h 192.168.15.188 -c "delete from ir_mail_server;"
+psql -U odoo -d live_2023_09_05 -h 192.168.15.188 -c "delete from ir_ui_view where id=378;"
+
+### odoo 12 test server
+ssh mohavia@192.168.15.222
+Rom@rico
+sudo su dylan
+
+###odoo 12 live database
+AaW34sEdRfTg45@
+
+###luhn
+docker exec -it
+docker exec -it odoo8_odoo_1 /bin
+ls
+python3 saidcheck.py 8904135027089
+pip3 install luhn
+
+
+
+odoo 12 live
+ssh mohavias@projects.hwseta.org.za
+sudo su -
+docker exec -it odoo_docker_db_1 psql -U odoo -d hwseta
+
+sudo -u hwseta git pull
+
+#access database
+docker-compose exec db12 bin/bash
+psql -U odoo12 -d hwseta -h localhost
+
+docker exec -it hwsetadoc_web_1 /bin/bash
+
+#upgrade modules odoo 12
+docker exec -it odoo12_web_1 bash -c "odoo -c /etc/odoo/odoo_update.conf -d basic --db_user odoo12 --db_host db12 --db_pass odoo12 -u hwseta_learners,hwseta_finance,hwseta_project,hwseta_project_eoi_link,hwseta_project_finance_link,hwseta_setmis"
+
+docker-compose exec web odoo -c /etc/odoo/odoo_update.conf -d hwseta -u hwseta_project
+history |grep hwseta_project
+
+odoo8 workshop
+ssh mohavia@workshop.hwseta.org.za
+
+>>>>>>>>>>>>>>>>>>> updating modules on live v8
+docker exec -it hwsetadocker_web_1 bash -c "/usr/bin/python /usr/bin/odoo.py --config=/var/log/odoo/<alt config file> -u <comma separated list of modules> -d HWSETA --db_host=<host ip or db docker name> --db_user=<pg user> --xmlrpc-port=<any port other than the normal one>"
+
+docker exec --user odoo -it hwsetadocker_web_1 bash -c "/usr/bin/python /usr/bin/odoo.py --config=/var/log/odoo/odoo_update.conf -u hwseta_website,hwseta_etqe -d HWSETA --db_host=172.1.0.8 --db_user=odoo --xmlrpc-port=8084"
+
+
+#git
+
+git diff main
+
+##access Data Base
+docker exec -it modoc_db_1 /bin/bash
+psql -U odoo12 -d blank(blank is the database name)
+psql -U odoo -d postgres
+drop database live_19_07_2022 (force)
+DROP DATABASE test ;
+psql -U odoo -h localhost -d postgres
+
+
+Provide the port and host via -p/-h options:
+
+sudo -u postgres psql -p 5432 -h 127.0.0.1
+
+createdb -p 5432 -h 127.0.0.1 template_postgis
+
+
+psql -U odoo -d live_2023_03_01 -h localhost -c "delete from ir_ui_view where id=378;"
+
+
+update ir_module_module set state = 'installed' where name like ('%etqe%')
+select * from ir_ui_view where arch like ('%employer_approval_start_date%')
+
+
+
+https://phoenixnap.com/kb/postgresql-drop-database#:~:text=The%20first%20method%20to%20remove,execute%20the%20DROP%20DATABASE%20command.
+
+
+
+
+
+docker exec -it modoc_db12_1 psql -U odoo12 -d 04_27
+select * from ir_config_parameter;
+update ir_config_parameter set value='False' where id=24;
+update ir_config_parameter set value='http://192.168.15.222:8016' where id=4;
+update ir_config_parameter set value='False' where id=4;
+
+#To install packages directly in docker
+docker-compose up -d
+docker exec -it modoc_web_1 /bin/bash
+pip3 install email_validator
+docker exec -u root -it modoc_web_1 /bin/bash
+pip3 install email_validator
+
+
+history|grep exec
+
+
+
+docker exec -it modoc2_web_1 bash
+/usr/bin/odoo -p 8070 -d hwseta -u all
+/usr/bin/odoo -p 8070 -d helpdesk --db_user odoo12 --db_host db12 --db_pass odoo12 -u all
+docker exec -it modoc2_web_1 bash -c "/usr/bin/odoo -p 8070 -d hwseta_mo --db_user odoo12 --db_host db12 --db_pass odoo12 -u hwseta_setmis"
+
+
+chmod +x saidcheck.py 
+cp /var/log/odoo/saidcheck.py /bin
+
+
+sudo chown -R dylan:dylan objects/
+
+
+
+branches to remember
+725_import_and_eval_qualiifications
+
+
